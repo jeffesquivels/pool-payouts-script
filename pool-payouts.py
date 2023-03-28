@@ -9,6 +9,7 @@ from payments import Payments
 LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 DEFAULT_LOG_LEVEL = "INFO"
 PAYMENT_FREQ = 60 * 60 # 1 hour
+PAYMENT_FREQ_ST = 1 * 60 # 1 minute
 
 
 class Range(object):
@@ -100,7 +101,10 @@ async def run_client(host, port, private_key, pool_fee, use_stake_txns):
             payments=payments,
             reward_address=reward_account.address)
         while True:
-            await asyncio.sleep(PAYMENT_FREQ)
+            if use_stake_txns:
+                await asyncio.sleep(PAYMENT_FREQ_ST)
+            else:
+                await asyncio.sleep(PAYMENT_FREQ)
             await payments.process_payments(client, reward_account.address,
                                             use_stake_txns)
 
